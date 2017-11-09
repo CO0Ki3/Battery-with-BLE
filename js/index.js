@@ -1,4 +1,3 @@
-chrome.bluetooth.onConnection.addListener(onConnected);
 navigator.getBattery().then(function(battery) {
   var yes = "Yes";
   var no = "No";
@@ -28,7 +27,6 @@ navigator.getBattery().then(function(battery) {
 var bluetoothDevice=[{uuid: '0000ffe0-0000-1000-8000-00805f9b34fb', name: 'sunrin'}];
 function onButtonClick() {
   navigator.bluetooth.requestDevice({
-     // filters: [...] <- Prefer filters to save energy & show relevant devices.
      acceptAllDevices: true})
   .then(device => {
     bluetoothDevice.addEventListener('gattserverdisconnected', onDisconnected);
@@ -40,7 +38,7 @@ function onButtonClick() {
 }
 
 function connect() {
-  exponentialBackoff(3 /* max retries */, 2 /* seconds delay */,
+  exponentialBackoff(3 , 2,
     function toTry() {
       time('Connecting to Bluetooth Device... ');
       return bluetoothDevice.gatt.connect();
@@ -57,12 +55,6 @@ function onDisconnected() {
   log('> Bluetooth Device disconnected');
   connect();
 }
-
-/* Utils */
-
-// This function keeps calling "toTry" until promise resolves or has
-// retried "max" number of times. First retry has a delay of "delay" seconds.
-// "success" is called upon success.
 function exponentialBackoff(max, delay, toTry, success, fail) {
   toTry().then(result => success(result))
   .catch(_ => {
