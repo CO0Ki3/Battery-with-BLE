@@ -23,7 +23,12 @@ navigator.getBattery().then(function(battery) {
                 + battery.level * 100 + "%");
   }
 });
-
+var msg;
+if(battery.charging == yes) {
+  msg = 'y';
+} else if(battery.charging == no) {
+  msg = 'n';
+}
 var bluetoothDevice=[{uuid: '0000ffe0-0000-1000-8000-00805f9b34fb', name: 'sunrin'}];
 function onButtonClick() {
   navigator.bluetooth.requestDevice({
@@ -66,6 +71,24 @@ function exponentialBackoff(max, delay, toTry, success, fail) {
       exponentialBackoff(--max, delay * 2, toTry, success, fail);
     }, delay * 1000);
   });
+  public void write(byte[] bytes) {
+            try {
+                mmOutStream.write(bytes);
+                Message writtenMsg = mHandler.obtainMessage(
+                        MessageConstants.MESSAGE_WRITE, -1, -1, mmBuffer);
+                writtenMsg.sendToTarget(battery.level);
+                writtenMsg.sendToTarget(msg);
+            } catch (IOException e) {
+                Log.e(TAG, "Error occurred when sending data", e);
+                Message writeErrorMsg =
+                        mHandler.obtainMessage(MessageConstants.MESSAGE_TOAST);
+                Bundle bundle = new Bundle();
+                bundle.putString("toast",
+                        "Couldn't send data to the other device");
+                writeErrorMsg.setData(bundle);
+                mHandler.sendMessage(writeErrorMsg);
+            }
+        }
 }
 
 function time(text) {
